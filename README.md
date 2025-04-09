@@ -165,7 +165,7 @@ ssh -L 3000:localhost:3000 ubuntu@<your_server_ip> -p <port>
 
 **Create account in [HuggingFace](https://huggingface.co/)**
 
-**Create an Access Token with `Write` permissions [here](https://huggingface.co/settings/tokens) and paste at prompt**
+**Create an Access Token with `Write` permissions [here](https://huggingface.co/settings/tokens) and paste in prompt**
 
 ---
 

@@ -1,238 +1,191 @@
 # hyper-kuzco-gensyn
-Here is a 3-in-1 guide to run kuzco &amp; gensyn nodes on hyperbolic Labs 24/7
 
+This guide walks you through renting a GPU on Hyperbolic Labs and using it to run nodes for:
 
-This guide explains how to rent a GPU on Hyperbolic Labs and use it to deploy nodes for Kuzco (a decentralized GPU network on Solana) and Gensyn (a layer-1 trustless protocol for deep learning compute). The entire process will be handled on the remote GPU terminal, which means your node keeps running 24/7—even when your local machine (e.g., your Mac) is off.
-
-
-> Note: All commands here are to be run inside the Linux terminal of your rented GPU instance (accessed via SSH).
-
-
-## Table of Contents
-
-- [Step 1: Rent a GPU on Hyperbolic Labs](#step-1-rent-a-gpu-on-hyperbolic-labs)
-
-- [Step 2: Run the Kuzco Node](#step-2-run-the-kuzco-node)
-
-- [Step 3: Run the Gensyn Node](#step-3-run-the-gensyn-node)
-
-- [Additional Notes](#additional-notes)
+- **Kuzco** — A decentralized GPU network (Solana ecosystem)
+- **Gensyn** — A trustless protocol for deep learning computation
 
 ---
 
-## Step 1: Rent a GPU on Hyperbolic Labs
+## ✅ Step 1: Rent a GPU via Hyperbolic Labs
 
+1. Go to [https://app.hyperbolic.xyz](https://app.hyperbolic.xyz)
+2. Sign up with Google or Email and verify your account.
+3. Click **Deposit** → enter the amount you want to deposit → **Pay Now**.
+4. Select **Pay without link** to view deposit options and complete payment.
 
-### 1.1. Create Your Account & Fund It
+### 🔐 Add Your SSH Public Key
 
-1. Visit [Hyperbolic Labs](https://app.hyperbolic.xyz).
+5. Open your terminal (Mac or VPS) and generate an SSH key:
 
-2. Sign up using your Email or Google account.
+```bash
+ssh-keygen
+```
 
-3. Verify your account through the confirmation email.
+> Just press enter to accept default file location and set a password (or press enter to skip password).
 
-4. Click on **Deposit**, enter the deposit amount, and follow the checkout process (choose “Pay without link” if necessary).
+6. View your public key:
 
+```bash
+cat ~/.ssh/id_rsa.pub
+```
 
-### 1.2. Add Your SSH Public Key
+7. Copy the full key starting with `ssh-ed25519` or `ssh-rsa`.
 
-1. On your local machine, open your terminal and generate an SSH key:
-   ```bash
-   ssh-keygen
-   ```
-   - Press Enter to use the default file location.
-   - Enter a passphrase (or press Enter twice for no password).
-
-
-2. Copy your public key:
-   ```bash
-   cat ~/.ssh/id_rsa.pub
-   ```
-   - The key starts with `ssh-ed...`.
-
-
-3. In the Hyperbolic Labs dashboard, navigate to **Settings → SSH Public Key**.
-
-4. Paste your key into the field and click **Save**.
-
-
-### 1.3. Rent a GPU Instance
-
-1. Go to the **Rent GPU** section in Hyperbolic Labs.
-
-2. Select a GPU instance with the following recommendations:
-
-   - **RAM:** Approximately 24GB
-
-   - **GPU Options:** RTX 3090, RTX 4090, A100, or H100
-
-3. Choose the **Ubuntu 22.04 with Nvidia CUDA** template.
-
-4. Confirm your selection to launch the instance.
-
-5. Copy the provided SSH command (e.g., `ssh -p 12345 username@your-instance-ip`) from the dashboard.
-
-6. Open your terminal and paste the SSH command to connect to your GPU instance.  
-
-   > **Remember:** You are now working on the remote GPU terminal provided by Hyperbolic Labs. Any commands executed here run on the cloud instance 24/7, independent of your local machine.
+8. Go to **Settings** on Hyperbolic → paste your SSH key under **SSH Public Key** → Save.
 
 ---
 
-## Step 2: Run the Kuzco Node
+## 🚀 Step 2: Connect to GPU and Run Kuzco Node
 
-Kuzco is a decentralized GPU network that rewards you in $KZO points for contributing your GPU power. Follow these steps to deploy a Kuzco worker.
+### 🎯 Rent a GPU
 
+1. Go to the **Rent GPU** section.
+2. Choose any with **24GB RAM** and CUDA like `RTX 3090`, `4090`, `A100`, or `H100`.
+3. Select **Nvidia CUDA with Ubuntu 22.04**.
+4. After instance starts, copy the provided `ssh` command.
 
-### 2.1. Prepare the Environment
+### 🔗 Connect to Your GPU
 
-1. Update the system and install required tools:
-   ```bash
-   sudo apt update && sudo apt install -y curl screen
-   ```
+Paste the `ssh` command into your terminal:
 
-2. Create a directory for Kuzco and switch to it:
-   ```bash
-   mkdir -p ~/kuzco && cd ~/kuzco
-   ```
+```bash
+ssh <your-user>@<gpu-instance-ip>
+```
 
-3. Start a new screen session (this allows the process to run in the background):
-   ```bash
-   screen -S kuzco
-   ```
+Enter passcode if you created one earlier.
 
-
-### 2.2. Deploy the Kuzco Worker
-
-1. Visit [https://inference.supply](https://inference.supply) and create your account.
-
-2. Navigate to the **Workers** section and create a new worker.  
-
-   - Select **CLI** as the install type.
-
-3. Copy the commands provided on the website and paste them into your GPU terminal (inside the `screen` session) to install the CLI and launch your worker.
-
-4. Once your Kuzco node is running (monitor the output), detach the screen by pressing `Ctrl + A` then `D`.
-
-5. To reattach the screen later:
-   ```bash
-   screen -r kuzco
-   ```
-
-6. Verify your Kuzco node status via the Kuzco web interface after 5 minutes.
+You are now inside your rented GPU.
 
 ---
 
-## Step 3: Run the Gensyn Node
+### ⚙️ Install Dependencies
 
-Gensyn Protocol is designed for deep learning compute, rewarding you for offering compute capacity. The following instructions set up your Gensyn node.
+```bash
+sudo apt update && sudo apt install -y curl screen
+```
 
+### 🛠️ Set Up Kuzco
 
-### 3.1. Prepare the Environment
+```bash
+mkdir -p ~/kuzco && cd ~/kuzco
+screen -S kuzco
+```
 
-1. Install necessary dependencies:
-   ```bash
-   sudo apt update && sudo apt install -y python3 python3-venv python3-pip curl wget screen git lsof
-   ```
+> Keep this screen session open for the next step.
 
-2. (Optional) Install Yarn:
-   ```bash
-   curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
-   echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
-   sudo apt update && sudo apt install -y yarn
-   ```
+1. Visit: [https://inference.supply](https://inference.supply)
+2. Create an account
+3. Go to **Workers** → create a worker → choose **CLI** install
+4. Copy and paste the commands shown into the terminal screen
 
-3. **Install Node.js (Choose one alternative method):**
+Once the worker is running:
 
-   **Option A: Using NodeSource**
-   ```bash
-   curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
-   sudo apt-get install -y nodejs
-   ```
-   
-   **Or Option B: Using NVM (Node Version Manager)**
-   ```bash
-   curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh | bash
-   # Activate NVM (or restart your terminal)
-   export NVM_DIR="$HOME/.nvm"
-   [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
-   nvm install 18
-   nvm use 18
-   ```
+- Detach the screen: `Ctrl + A + D`
+- Reattach later with: `screen -r kuzco`
 
-
-### 3.2. Clone and Launch the Gensyn Node
-
-1. Clone the RL Swarm repository for Gensyn:
-   ```bash
-   cd $HOME
-   [ -d rl-swarm ] && rm -rf rl-swarm
-   git clone https://github.com/0x5at/rl-swarm
-   cd rl-swarm
-   ```
-
-   > **Note:** This guide uses the repository for RL Swarm, but you can replace it with your own if needed.
-   
-2. Create a new screen session for Gensyn:
-   ```bash
-   screen -S gensyn
-   ```
-
-3. Start the node:
-   ```bash
-   python3 -m venv .venv && . .venv/bin/activate && ./run_rl_swarm.sh
-   ```
-
-4. Follow the interactive prompts:
-
-   - When asked "Would you like to connect to the Testnet? [Y/n]", type `Y` and press Enter.
-
-   - When asked "Would you like to push models you train in the RL swarm to the Hugging Face Hub? [y/N]", type `N` and press Enter.
-
-   - When prompted for an ngrok authtoken, visit [ngrok.com](https://ngrok.com) to create an account, retrieve your authtoken, and paste it into the terminal.
-
-   - A URL ending in `http://ngrok-free.app` will be provided. Open it in your browser and sign in to complete authentication.
-
-6. Once you see a welcome message (e.g., "Hello 🐈 [your username]"), your Gensyn node is live.
-
-7. Detach the screen by pressing `Ctrl + A` then `D`.  
- 
-   To resume later:
-   ```bash
-   screen -r gensyn
-   ```
-
-8. Verify your node status by visiting the [Gensyn Dashboard](https://dashboard.gensyn.ai).
+✅ Kuzco node is running in the background.
 
 ---
 
-## Additional Notes
+## 🧪 Step 3: Run Gensyn Node
 
-- **Running Remotely:**  
+### 🔁 Return to Home Directory First
 
-  All the commands and processes above are executed on your cloud GPU instance via SSH. Your local computer (Mac or PC) does not need to be on once the instance is running.
+```bash
+cd $HOME
+```
 
-- **Screen Sessions:**  
+### 📦 Install Dependencies
 
-  We use `screen` to allow the processes to continue running in the background. This is essential for keeping your nodes live even when you disconnect from SSH.
+```bash
+sudo apt update && sudo apt install -y python3 python3-venv python3-pip curl wget screen git lsof
+```
 
-- **Monitoring:**  
+```bash
+curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
+echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
+sudo apt update && sudo apt install -y yarn
+```
 
-  Regularly check your Kuzco and Gensyn dashboards to monitor node performance and resource utilization.
+### 🟢 Install Node.js + npm (Official NodeSource Script)
+
+```bash
+curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+sudo apt install -y nodejs
+```
+
+---
+
+### 🧬 Clone and Run RL-Swarm
+
+```bash
+cd $HOME
+[ -d rl-swarm ] && rm -rf rl-swarm
+git clone https://github.com/0x5at/rl-swarm
+cd rl-swarm
+screen -S gensyn
+```
+
+### 🧠 Run the RL Swarm Script
+
+```bash
+python3 -m venv .venv
+. .venv/bin/activate
+./run_rl_swarm.sh
+```
+
+Respond to prompts as follows:
+
+- `Connect to Testnet?` → **Y**
+
+> 🛠️ If the terminal gets stuck waiting after this step, here's how to proceed:
+
+### 🌐 Set Up Port Forwarding (If Terminal Freezes)
+
+1. On your **local machine**, open a **new terminal window** (or tab) and run:
+
+```bash
+ssh -L 3000:localhost:3000 ubuntu@<your_server_ip> -p <port>
+```
+
+> Replace `ubuntu@<your_server_ip> -p <port>` with the actual SSH command Hyperbolic gave you (e.g., `ubuntu@12.34.56.78 -p 2222`).
+
+2. Leave that terminal running.
+
+3. Open [http://localhost:3000](http://localhost:3000) in your browser and complete the login.
+
+4. Go back to the terminal where you ran `./run_rl_swarm.sh`. It should now continue.
+
+5. After it starts running, you can **close the browser** and **the tunnel terminal**.
 
 ---
 
-## Conclusion
+- `Push models to HuggingFace?` → **Y/N** (Optional)
 
-By following this guide, you have:
+**Create account in [HuggingFace](https://huggingface.co/)**
 
-- **Rented a GPU instance on Hyperbolic Labs** and accessed its remote Linux terminal.
-
-- **Deployed a Kuzco node** to contribute GPU resources and earn rewards.
-
-- **Launched a Gensyn node** for deep learning compute, using official methods for installing dependencies like Node.js.
-
-Your nodes now run 24/7 on the Hyperbolic GPU instance, independent of your local machine.
-
-Happy computing, and enjoy running your decentralized nodes!
+**Create an Access Token with `Write` permissions [here](https://huggingface.co/settings/tokens) and paste at prompt**
 
 ---
+
+## ✅ Managing Screens
+
+- **Detach current screen**: `Ctrl + A + D`
+- **List active screens**: `screen -ls`
+- **Reattach to a screen**: `screen -r <name>`
+
+---
+
+## 🧠 Useful Links
+
+- Gensyn Dashboard: [https://dashboard.gensyn.ai](https://dashboard.gensyn.ai)
+- Hyperbolic: [https://app.hyperbolic.xyz](https://app.hyperbolic.xyz)
+- Kuzco CLI: [https://inference.supply](https://inference.supply)
+
+---
+
+## 🧩 Final Notes
+
+- This setup allows you to run both Gensyn and Kuzco nodes 24/7 using rented GPU power from Hyperbolic.
+- All screens will keep running in the background even if you disconnect from the GPU or shut your Mac.

@@ -177,6 +177,34 @@ ssh -L 3000:localhost:3000 ubuntu@<your_server_ip> -p <port>
 
 ---
 
+## 🔐 Gensyn `swarm.pem` Backup Guide
+
+To safely back up your `swarm.pem` key (used to identify your Gensyn node), run the following command **on your GPU machine**:
+
+```bash
+mkdir -p ~/gensyn_backups && cp /home/ubuntu/rl-swarm/swarm.pem ~/gensyn_backups/swarm_$(date +%F_%H-%M-%S).pem
+```
+
+### ✅ What it does:
+- Creates a backup folder (`~/gensyn_backups`) if it doesn’t exist.
+- Copies your `swarm.pem` file with a timestamp to avoid overwriting previous backups.
+
+### 📂 Example output:
+```bash
+~/gensyn_backups/swarm_2025-04-12_22-43-03.pem
+```
+
+### ♻️ To restore a backup:
+If you ever need to restore a key, copy it back to the original path like this:
+
+```bash
+cp ~/gensyn_backups/swarm_YYYY-MM-DD_HH-MM-SS.pem /home/ubuntu/rl-swarm/swarm.pem
+```
+
+> Replace the filename with the exact timestamped backup you want to restore.
+
+---
+
 ## 🧠 Useful Links
 
 - Gensyn Dashboard: [https://dashboard.gensyn.ai](https://dashboard.gensyn.ai)

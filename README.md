@@ -122,7 +122,7 @@ sudo apt install -y nodejs
 ```bash
 cd $HOME
 [ -d rl-swarm ] && rm -rf rl-swarm
-git clone https://github.com/0x5at/rl-swarm
+git clone https://github.com/gensyn-ai/rl-swarm
 cd rl-swarm
 screen -S gensyn
 ```
